@@ -3,7 +3,7 @@
 //report can be found on coverage/lcov-report
 
 import deepFreeze from 'deep-freeze';
-import reducer from './anecdoteReducer';
+import anecdoteReducer from './anecdoteReducer';
 
 const initialState = [
   {
@@ -21,7 +21,7 @@ const initialState = [
 
 describe('anecdoteReducer', () => {
   test('should return a proper initial state when called with undefined state', () => {
-    const anecdotes = reducer(undefined, 'DO_NOTHING');
+    const anecdotes = anecdoteReducer(undefined, 'DO_NOTHING');
     expect(anecdotes.map(a => a.content)).not.toHaveLength(0);
   });
 
@@ -35,7 +35,7 @@ describe('anecdoteReducer', () => {
       }
     };
     deepFreeze(state);
-    const newState = reducer(state, action);
+    const newState = anecdoteReducer(state, action);
     expect(newState[0].votes).toBe(1);
   });
 
@@ -51,7 +51,7 @@ describe('anecdoteReducer', () => {
       }
     };
     deepFreeze(state);
-    const newState = reducer(state, action);
+    const newState = anecdoteReducer(state, action);
     expect(newState).toHaveLength(3);
     expect(newState).toContainEqual(action.data);
   });
