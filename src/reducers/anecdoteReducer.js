@@ -1,15 +1,12 @@
+import anecdoteService from '../services/anecdotes';
+
 const anecdoteReducer = (state = [], action) => {
   switch(action.type){
     case 'INIT_ANECDOTES':
       return action.data;
     case 'VOTE':{
-      const id = action.data.id;
-      const anecdoteToVote = state.find(a => a.id === id);
-      const votedAnectode = {
-        ...anecdoteToVote,
-        votes: anecdoteToVote.votes + 1
-      };
-      return state.map(a => a.id === id ? votedAnectode : a);
+      const updatedAnecdote = action.data;
+      return state.map(a => a.id === updatedAnecdote.id ? updatedAnecdote : a);
     }
     case 'NEW_ANECDOTE':
       return [ ...state, action.data];
@@ -18,25 +15,35 @@ const anecdoteReducer = (state = [], action) => {
   }
 };
 
-export const initializeAnecdotes = (anecdotes) => {
-  return {
-    type: 'INIT_ANECDOTES',
-    data: anecdotes
+export const initializeAnecdotes = () => {
+  return async dispatch => {
+    const anecdotes = await anecdoteService.getAll();
+    dispatch({
+      type: 'INIT_ANECDOTES',
+      data: anecdotes
+    });
   };
 };
 
 
-export const createAnecdote = (anecdoteObject) => {
-  return {
-    type: 'NEW_ANECDOTE',
-    data : anecdoteObject
+export const createAnecdote = (content) => {
+  return async dispatch => {
+    const newAnecdote = await anecdoteService.addNewAnecdote(content);
+    dispatch({
+      type:'NEW_ANECDOTE',
+      data: newAnecdote
+    });
   };
 };
 
-export const voteAnecdote = (id) => {
-  return {
-    type: 'VOTE',
-    data: { id }
+export const voteAnecdote = (anecdote) => {
+  return async dispatch => {
+    const changedAnecdote = { ...anecdote, votes:anecdote.votes+1 };
+    const updatedAnecdote = await anecdoteService.updateAnecdote(changedAnecdote, anecdote.id);
+    dispatch({
+      type: 'VOTE',
+      data: updatedAnecdote
+    });
   };
 };
 

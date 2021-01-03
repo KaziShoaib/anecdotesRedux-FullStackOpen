@@ -31,20 +31,22 @@ const AnecdoteList = () => {
       return sortedAnecdotes.filter(a => a.content.toLowerCase().includes(filterString.toLowerCase()));
 
   });
+
   const dispatch = useDispatch();
+
+  const manageVoting = async (anecdote) => {
+    await dispatch(voteAnecdote(anecdote));
+    //await???
+    dispatch(createNotification(`You voted for ${anecdote.content}`, 5000));
+  };
+
   return (
     <div>
       {anecdotes.map(anecdote =>
         <Anecdote
           key = {anecdote.id}
           anecdote = {anecdote}
-          handleClick = {() => {
-            dispatch(voteAnecdote(anecdote.id));
-            dispatch(createNotification(`You voted for ${anecdote.content}`));
-            setTimeout(() => {
-              dispatch(createNotification(''));
-            }, 5000);
-          }}
+          handleClick = {() => manageVoting(anecdote)}
         />
       )}
     </div>

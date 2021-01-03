@@ -8,10 +8,18 @@ const notificationReducer = (state = '', action) => {
 };
 
 
-export const createNotification = (notificationMessage) => {
-  return {
-    type: 'NEW_NOTIFICATION',
-    notification: notificationMessage
+export const createNotification = (notificationMessage, waitingTime) => {
+  return async dispatch => {
+    dispatch({
+      type: 'NEW_NOTIFICATION',
+      notification: notificationMessage
+    });
+    setTimeout(() => {
+      dispatch({
+        type: 'NEW_NOTIFICATION',
+        notification: ''
+      });
+    }, waitingTime);
   };
 };
 
