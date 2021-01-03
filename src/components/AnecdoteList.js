@@ -1,5 +1,5 @@
 import React from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import { connect } from 'react-redux';
 import { voteAnecdote } from '../reducers/anecdoteReducer';
 import { createNotification } from '../reducers/notficationReducer';
 
@@ -19,30 +19,18 @@ const Anecdote = ({ anecdote, handleClick }) => {
 };
 
 
-const AnecdoteList = () => {
-  //sorting states without mutation
-  //soring is done in descending order of votes
-  const anecdotes = useSelector(state => {
-    const sortedAnecdotes = [...state.anecdotes].sort((a, b) => b.votes - a.votes);
-    const filterString = state.filter;
-    if(filterString === '')
-      return sortedAnecdotes;
-    else
-      return sortedAnecdotes.filter(a => a.content.toLowerCase().includes(filterString.toLowerCase()));
+const AnecdoteList = (props) => {
 
-  });
-
-  const dispatch = useDispatch();
 
   const manageVoting = async (anecdote) => {
-    await dispatch(voteAnecdote(anecdote));
+    await props.voteAnecdote(anecdote);
     //await???
-    dispatch(createNotification(`You voted for ${anecdote.content}`, 5000));
+    props.createNotification(`You voted for ${anecdote.content}`, 5000);
   };
 
   return (
     <div>
-      {anecdotes.map(anecdote =>
+      {props.anecdotes.map(anecdote =>
         <Anecdote
           key = {anecdote.id}
           anecdote = {anecdote}
@@ -53,5 +41,22 @@ const AnecdoteList = () => {
   );
 };
 
+const mapStateToProps = (state) => {
+  const filterString = state.filter;
+  const sortedAnecdotes = [...state.anecdotes].sort((a, b) => b.votes - a.votes);
+  if(filterString === '')
+    return {
+      anecdotes: sortedAnecdotes
+    };
+  else
+    return {
+      anecdotes: sortedAnecdotes.filter(a => a.content.toLowerCase().includes(filterString.toLowerCase()))
+    };
+};
 
-export default AnecdoteList;
+
+const mapDispatchToProps = { voteAnecdote, createNotification };
+
+const ConnectedAnecdoteList = connect(mapStateToProps, mapDispatchToProps)(AnecdoteList);
+
+export default ConnectedAnecdoteList;
